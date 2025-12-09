@@ -1,0 +1,7 @@
+/* Reset file for basic Material UI setup */
+body {
+  margin: 0;
+  background-color: #121212;
+  color: white;
+  font-family: Roboto, sans-serif;
+}
