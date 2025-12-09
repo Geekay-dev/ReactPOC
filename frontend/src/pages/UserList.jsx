@@ -153,10 +153,15 @@ export default function UserList() {
         </TableContainer>
       </Paper>
 
-      <Dialog open={Boolean(toDelete)} onClose={() => setToDelete(null)}>
-        <DialogTitle>Confirm delete</DialogTitle>
+      <Dialog 
+        open={Boolean(toDelete)} 
+        onClose={() => setToDelete(null)}
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-desc"      
+      >
+        <DialogTitle id="delete-dialog-title">Confirm delete</DialogTitle>
         <DialogContent>
-          <Typography>Are you sure you want to delete this user? This action cannot be undone.</Typography>
+          <Typography id="delete-dialog-desc">Are you sure you want to delete this user? This action cannot be undone.</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setToDelete(null)} disabled={deleting}>Cancel</Button>

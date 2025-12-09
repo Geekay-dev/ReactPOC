@@ -126,7 +126,8 @@ export default function EditUser() {
                   onChange={handleChange}
                   fullWidth
                   required
-                  inputProps={{ maxLength: 100 }}
+                  inputProps={{ maxLength: 100, tabIndex: 1 }}
+                  autoFocus
                 />
               </Grid>
 
@@ -181,6 +182,9 @@ export default function EditUser() {
                   type="submit"
                   variant="contained"
                   disabled={saving}
+                  size="medium"
+                  aria-label="Save changes"
+                  sx={{ minWidth: 120 }}
                 >
                   {saving ? <CircularProgress size={20} /> : "Save"}
                 </Button>
@@ -190,6 +194,8 @@ export default function EditUser() {
                   variant="outlined"
                   onClick={() => navigate("/users")}
                   disabled={saving}
+                  size="medium"
+                  aria-label="Cancel and go back to list"
                 >
                   Cancel
                 </Button>
@@ -204,6 +210,8 @@ export default function EditUser() {
         autoHideDuration={6000}
         onClose={() => setError("")}
         message={error}
+        role="status"
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
       />
     </Box>
   );

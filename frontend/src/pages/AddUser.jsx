@@ -96,7 +96,7 @@ export default function AddUser() {
                   onChange={handleChange}
                   fullWidth
                   required
-                  inputProps={{ maxLength: 100 }}
+                  inputProps={{ maxLength: 100, tabIndex: 1 }} autoFocus
                 />
               </Grid>
 
@@ -151,6 +151,9 @@ export default function AddUser() {
                   type="submit"
                   variant="contained"
                   disabled={saving}
+                  size="medium"
+                  aria-label="Create user"
+                  sx={{ minWidth: 120 }}
                 >
                   {saving ? <CircularProgress size={20} /> : "Create"}
                 </Button>
@@ -160,6 +163,8 @@ export default function AddUser() {
                   variant="outlined"
                   onClick={() => navigate("/users")}
                   disabled={saving}
+                  size="medium"
+                  aria-label="Cancel and go back to list"
                 >
                   Cancel
                 </Button>
@@ -174,6 +179,8 @@ export default function AddUser() {
         autoHideDuration={6000}
         onClose={() => setError("")}
         message={error}
+        role="status"
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
       />
     </Box>
   );
