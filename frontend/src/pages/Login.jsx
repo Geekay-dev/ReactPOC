@@ -3,87 +3,79 @@ import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
-  Card,
-  CardContent,
   TextField,
   Typography,
-  Alert,
+  Paper,
+  Stack,
 } from "@mui/material";
 
 export default function Login() {
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  function handleLogin() {
-    if (!name.trim()) {
-      setError("Please enter your name.");
+  const handleLogin = () => {
+    // Simple mock auth just for UI flow
+    if (username.trim() === "" || password.trim() === "") {
+      setError("Username and password are required.");
       return;
     }
-    localStorage.setItem("username", name);
-    navigate("/users");
-  }
 
-  function handleClear() {
-    setName("");
-    setError("");
-  }
+    if (username === "admin" && password === "admin") {
+      navigate("/users");
+    } else {
+      setError("Invalid credentials.");
+    }
+  };
 
   return (
     <Box
-      sx={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#121212",
-        padding: 2,
-      }}
+      height="100vh"
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      bgcolor="#f5f5f5"
     >
-      <Card sx={{ width: 420, padding: 2, backgroundColor: "#1e1e1e" }}>
-        <CardContent>
-          <Typography variant="h4" fontWeight="bold" gutterBottom color="white">
-            Login Page
-          </Typography>
-
-          <Typography variant="body2" color="gray" mb={2}>
-            Enter your name to continue to the User Directory.
+      <Paper elevation={3} sx={{ padding: 4, width: 360 }}>
+        <Stack spacing={2}>
+          <Typography variant="h5" textAlign="center" fontWeight="bold">
+            User Directory Login
           </Typography>
 
           <TextField
+            label="Username"
             fullWidth
-            label="Name"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             variant="outlined"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            sx={{
-              input: { color: "white" },
-              label: { color: "gray" },
-              mb: 2,
-            }}
+          />
+
+          <TextField
+            label="Password"
+            fullWidth
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            variant="outlined"
           />
 
           {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
+            <Typography color="error" fontSize={14}>
               {error}
-            </Alert>
+            </Typography>
           )}
 
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <Button variant="contained" onClick={handleLogin}>
-              Log In
-            </Button>
-
-            <Button variant="outlined" color="warning" onClick={handleClear}>
-              Clear
-            </Button>
-          </Box>
-
-          <Typography variant="caption" color="gray" display="block" mt={2}>
-            Demo only — no backend authentication.
-          </Typography>
-        </CardContent>
-      </Card>
+          <Button
+            type="button"
+            variant="contained"
+            fullWidth
+            onClick={handleLogin}
+          >
+            Login
+          </Button>
+        </Stack>
+      </Paper>
     </Box>
   );
 }

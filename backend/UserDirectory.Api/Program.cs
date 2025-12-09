@@ -2,6 +2,23 @@ using UserDirectory.Api.Data;
 using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
+// --- CORS: allow frontend dev server (Vite) ---
+var allowedOrigins = builder.Configuration.GetValue<string>("AllowedCorsOrigins")
+                     ?? "http://localhost:5173";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalDev", policy =>
+    {
+        policy
+            .WithOrigins(allowedOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .WithExposedHeaders("X-Total-Count", "WWW-Authenticate", "Pagination");
+    });
+});
+
+
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -36,10 +53,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowLocalDev");
+
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 // --- enable CORS here ---
-app.UseCors(MyAllowSpecificOrigins);
+//app.UseCors(MyAllowSpecificOrigins);
 // --- end ---
 app.MapControllers();
 

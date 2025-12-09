@@ -1,0 +1,60 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "run-backend",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["run"],
+      "options": {
+        "cwd": "${workspaceFolder}/backend/UserDirectory.Api"
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "dotnet-ready",
+        "pattern": [
+          {
+            "regexp": "^(.*)$",
+            "file": 1,
+            "message": 1
+          }
+        ],
+        "background": {
+          "beginsPattern": "Building",
+          "endsPattern": "Now listening on:"
+        }
+      }
+    },
+    {
+      "label": "run-frontend",
+      "type": "process",
+      "command": "npm",
+      "args": ["run", "dev"],
+      "options": {
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "vite-ready",
+        "pattern": [
+          {
+            "regexp": "^(.*)$",
+            "file": 1,
+            "message": 1
+          }
+        ],
+        "background": {
+          "beginsPattern": "VITE",
+          "endsPattern": "ready in"
+        }
+      }
+    },
+    {
+      "label": "run-app",
+      "dependsOn": [
+        "run-backend",
+        "run-frontend"
+      ]
+    }
+  ]
+}
