@@ -1,62 +1,187 @@
-// src/pages/AddUser.jsx
+// frontend/src/pages/AddUser.jsx
 import React, { useState } from "react";
-import { Box, Typography, TextField, Button, Alert } from "@mui/material";
+import {
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  Grid,
+  TextField,
+  Button,
+  Snackbar,
+  CircularProgress,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import api from "../services/api";
+//import axios from "../services/api"; // adapt if your axios instance path differs
+//- import axios from "../services/api"; // adapt if your axios instance path differs
+ import { api } from "../services/api";
 
 export default function AddUser() {
-  const [form, setForm] = useState({ name: "", age: "", city: "", state: "", pincode: "" });
-  const [error, setError] = useState("");
-  const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
 
-  function onChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  }
+  // form state
+  const [form, setForm] = useState({
+    name: "",
+    age: "",
+    city: "",
+    state: "",
+    pincode: "",
+  });
 
-  function validate() {
+  // ui state
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  // simple field-level validation rules
+  const validate = () => {
     if (!form.name.trim()) return "Name is required";
-    if (!/^\d+$/.test(String(form.age))) return "Age must be a number";
+    if (!form.age || isNaN(Number(form.age)) || Number(form.age) <= 0) return "Age must be a positive number";
     if (!form.city.trim()) return "City is required";
     if (!form.state.trim()) return "State is required";
-    if (form.pincode.length < 4) return "Pincode must be 4+ chars";
+    if (!/^\d{6}$/.test(form.pincode)) return "Pincode must be 6 digits";
     return null;
-  }
+  };
 
-  async function submit(e) {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const v = validate(); if (v) { setError(v); return; }
-    setSaving(true); setError("");
+    const err = validate();
+    if (err) {
+      setError(err);
+      return;
+    }
+
+    setSaving(true);
+    setError("");
     try {
-      await api.post("/api/users", {
-        name: form.name,
-        age: parseInt(form.age, 10),
-        city: form.city,
-        state: form.state,
-        pincode: form.pincode
-      });
+      // adapt endpoint if your API base differs
+          await api.createUser({
+            name: form.name.trim(),
+            age: Number(form.age),
+            city: form.city.trim(),
+            state: form.state.trim(),
+            pincode: form.pincode.trim(),
+          });
+
+      // on success, navigate back to list
       navigate("/users");
-    } catch (e) {
-      setError("Save failed");
-    } finally { setSaving(false); }
-  }
+    } catch (ex) {
+      console.error("Add user failed:", ex);
+      setError(
+        ex?.response?.data?.message ||
+        ex?.message ||
+        "Failed to create user. Please try again."
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
-    <Box component="form" onSubmit={submit}>
-      <Typography variant="h4" gutterBottom>Add user</Typography>
+    <Box sx={{ maxWidth: 900, margin: "24px auto", px: 2 }}>
+      <Card>
+        <CardHeader title="Add User" />
+        <CardContent>
+          <Box component="form" noValidate onSubmit={handleSubmit}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Name"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  inputProps={{ maxLength: 100, tabIndex: 1 }} autoFocus
+                />
+              </Grid>
 
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Age"
+                  name="age"
+                  value={form.age}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+                />
+              </Grid>
 
-      <TextField label="Name" name="name" value={form.name} onChange={onChange} fullWidth sx={{ mb: 2 }} />
-      <TextField label="Age" name="age" value={form.age} onChange={onChange} fullWidth sx={{ mb: 2 }} />
-      <TextField label="City" name="city" value={form.city} onChange={onChange} fullWidth sx={{ mb: 2 }} />
-      <TextField label="State" name="state" value={form.state} onChange={onChange} fullWidth sx={{ mb: 2 }} />
-      <TextField label="Pincode" name="pincode" value={form.pincode} onChange={onChange} fullWidth sx={{ mb: 2 }} />
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="City"
+                  name="city"
+                  value={form.city}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
 
-      <Box sx={{ display: "flex", gap: 2 }}>
-        <Button type="submit" variant="contained" disabled={saving}>Save</Button>
-        <Button variant="outlined" onClick={() => navigate("/users")}>Cancel</Button>
-      </Box>
+              <Grid item xs={12} md={3}>
+                <TextField
+                  label="State"
+                  name="state"
+                  value={form.state}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
+
+              <Grid item xs={12} md={3}>
+                <TextField
+                  label="Pincode"
+                  name="pincode"
+                  value={form.pincode}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  inputProps={{ inputMode: "numeric", maxLength: 6 }}
+                />
+              </Grid>
+
+              <Grid item xs={12} sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={saving}
+                  size="medium"
+                  aria-label="Create user"
+                  sx={{ minWidth: 120 }}
+                >
+                  {saving ? <CircularProgress size={20} /> : "Create"}
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outlined"
+                  onClick={() => navigate("/users")}
+                  disabled={saving}
+                  size="medium"
+                  aria-label="Cancel and go back to list"
+                >
+                  Cancel
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
+        </CardContent>
+      </Card>
+
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={() => setError("")}
+        message={error}
+        role="status"
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      />
     </Box>
   );
 }

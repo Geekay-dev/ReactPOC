@@ -5,3 +5,19 @@ body {
   color: white;
   font-family: Roboto, sans-serif;
 }
+/* frontend/src/index.css */
+
+/* stronger focus outlines for keyboard users (accessible but subtle) */
+:focus {
+  outline: 3px solid rgba(100, 150, 250, 0.9);
+  outline-offset: 2px;
+}
+
+/* visually-hidden utility for skip link or hidden labels */
+.visually-hidden {
+  position: absolute !important;
+  height: 1px; width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+}
